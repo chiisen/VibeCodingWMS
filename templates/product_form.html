@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{% if action == 'add' %}新增商品{% else %}編輯商品{% endif %} - 倉儲管理系統{% endblock %}
+{% block page_title %}{% if action == 'add' %}新增商品{% else %}編輯商品{% endif %}{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('products_list') }}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i>
+    返回列表
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    {% if action == 'add' %}新增商品{% else %}編輯商品{% endif %}
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">商品名稱 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{% if product %}{{ product.name }}{% endif %}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="barcode" class="form-label">條碼 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="barcode" name="barcode" 
+                                   value="{% if product %}{{ product.barcode }}{% endif %}" required>
+                            <div class="form-text">請輸入商品條碼，系統會自動檢查重複</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="unit" class="form-label">單位 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="unit" name="unit" required>
+                                <option value="">請選擇單位</option>
+                                <option value="個" {% if product and product.unit == '個' %}selected{% endif %}>個</option>
+                                <option value="箱" {% if product and product.unit == '箱' %}selected{% endif %}>箱</option>
+                                <option value="公斤" {% if product and product.unit == '公斤' %}selected{% endif %}>公斤</option>
+                                <option value="公升" {% if product and product.unit == '公升' %}selected{% endif %}>公升</option>
+                                <option value="包" {% if product and product.unit == '包' %}selected{% endif %}>包</option>
+                                <option value="盒" {% if product and product.unit == '盒' %}selected{% endif %}>盒</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label">類別 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">請選擇類別</option>
+                                <option value="食品" {% if product and product.category == '食品' %}selected{% endif %}>食品</option>
+                                <option value="飲料" {% if product and product.category == '飲料' %}selected{% endif %}>飲料</option>
+                                <option value="水果" {% if product and product.category == '水果' %}selected{% endif %}>水果</option>
+                                <option value="蔬菜" {% if product and product.category == '蔬菜' %}selected{% endif %}>蔬菜</option>
+                                <option value="日用品" {% if product and product.category == '日用品' %}selected{% endif %}>日用品</option>
+                                <option value="其他" {% if product and product.category == '其他' %}selected{% endif %}>其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('products_list') }}" class="btn btn-secondary me-2">取消</a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if action == 'add' %}
+                                <i class="bi bi-plus-circle"></i>
+                                新增商品
+                            {% else %}
+                                <i class="bi bi-check-circle"></i>
+                                更新商品
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}出庫作業 - 倉儲管理系統{% endblock %}
+{% block page_title %}出庫作業{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">出庫作業</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('outbound_submit') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="product_id" class="form-label">選擇商品 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="product_id" name="product_id" required>
+                                <option value="">請選擇商品</option>
+                                {% for product_id, product in products.items() %}
+                                <option value="{{ product_id }}">{{ product.name }} ({{ product_id }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location_id" class="form-label">出庫儲位 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="location_id" name="location_id" required>
+                                <option value="">請選擇儲位</option>
+                                {% for location_id, location in locations.items() %}
+                                <option value="{{ location_id }}">{{ location.desc }} ({{ location_id }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="quantity" class="form-label">出庫數量 <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" 
+                                   min="1" required placeholder="請輸入出庫數量">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">目前庫存</label>
+                            <div id="current-stock" class="form-control-plaintext text-muted">
+                                請先選擇商品和儲位
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-arrow-up-circle"></i>
+                            確認出庫
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">操作說明</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-info-circle"></i> 出庫流程說明</h6>
+                    <ol class="mb-0">
+                        <li>選擇要出庫的商品</li>
+                        <li>選擇出庫的儲位</li>
+                        <li>輸入出庫數量</li>
+                        <li>系統檢查庫存是否足夠</li>
+                        <li>確認出庫資訊</li>
+                        <li>系統自動扣減庫存</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-danger">
+                    <h6><i class="bi bi-exclamation-triangle"></i> 注意事項</h6>
+                    <ul class="mb-0">
+                        <li>出庫數量不能超過現有庫存</li>
+                        <li>出庫數量必須大於 0</li>
+                        <li>出庫記錄會保存在交易歷史中</li>
+                        <li>庫存不足時會顯示錯誤訊息</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateStockInfo() {
+    const productId = document.getElementById('product_id').value;
+    const locationId = document.getElementById('location_id').value;
+    const stockInfo = document.getElementById('current-stock');
+    
+    if (productId && locationId) {
+        fetch(`/api/stock/${productId}/${locationId}`)
+            .then(response => response.json())
+            .then(data => {
+                stockInfo.innerHTML = `
+                    <strong>目前庫存：</strong>${data.quantity}
+                `;
+            })
+            .catch(error => {
+                stockInfo.innerHTML = '<span class="text-danger">查詢庫存失敗</span>';
+            });
+    } else {
+        stockInfo.textContent = '請先選擇商品和儲位';
+    }
+}
+
+document.getElementById('product_id').addEventListener('change', updateStockInfo);
+document.getElementById('location_id').addEventListener('change', updateStockInfo);
+</script>
+{% endblock %}

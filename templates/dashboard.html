@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}儀表板 - 倉儲管理系統{% endblock %}
+{% block page_title %}儀表板{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 統計卡片 -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            總商品數
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_products }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-box fs-2 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            總儲位數
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_locations }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-geo-alt fs-2 text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            總庫存量
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_stock_quantity }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-clipboard-data fs-2 text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            今日交易
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            入庫 {{ stats.today_inbound }} | 出庫 {{ stats.today_outbound }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-arrow-repeat fs-2 text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 快速操作 -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">快速操作</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('products_add') }}" class="btn btn-primary btn-block w-100">
+                            <i class="bi bi-plus-circle"></i>
+                            新增商品
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('locations_add') }}" class="btn btn-success btn-block w-100">
+                            <i class="bi bi-plus-circle"></i>
+                            新增儲位
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('inbound') }}" class="btn btn-info btn-block w-100">
+                            <i class="bi bi-arrow-down-circle"></i>
+                            入庫作業
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('outbound') }}" class="btn btn-warning btn-block w-100">
+                            <i class="bi bi-arrow-up-circle"></i>
+                            出庫作業
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 系統資訊 -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">系統資訊</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>系統版本：</strong></td>
+                            <td>VibeCodingWMS v1.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>技術架構：</strong></td>
+                            <td>Flask + Bootstrap</td>
+                        </tr>
+                        <tr>
+                            <td><strong>資料儲存：</strong></td>
+                            <td>記憶體 + JSON 檔案</td>
+                        </tr>
+                        <tr>
+                            <td><strong>最後更新：</strong></td>
+                            <td id="last-update">載入中...</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 功能導航 -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">功能導航</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100 border-0">
+                            <div class="card-body text-center">
+                                <i class="bi bi-box fs-1 text-primary mb-3"></i>
+                                <h5 class="card-title">商品管理</h5>
+                                <p class="card-text">管理商品基本資料，包含新增、編輯、刪除商品資訊。</p>
+                                <a href="{{ url_for('products_list') }}" class="btn btn-primary">進入</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100 border-0">
+                            <div class="card-body text-center">
+                                <i class="bi bi-geo-alt fs-1 text-success mb-3"></i>
+                                <h5 class="card-title">儲位管理</h5>
+                                <p class="card-text">管理倉庫儲位資訊，建立和維護儲位資料。</p>
+                                <a href="{{ url_for('locations_list') }}" class="btn btn-success">進入</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100 border-0">
+                            <div class="card-body text-center">
+                                <i class="bi bi-clipboard-data fs-1 text-info mb-3"></i>
+                                <h5 class="card-title">庫存查詢</h5>
+                                <p class="card-text">查詢即時庫存狀況，支援多種篩選條件。</p>
+                                <a href="{{ url_for('inventory') }}" class="btn btn-info">進入</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card h-100 border-0">
+                            <div class="card-body text-center">
+                                <i class="bi bi-check2-square fs-1 text-warning mb-3"></i>
+                                <h5 class="card-title">盤點作業</h5>
+                                <p class="card-text">進行庫存盤點，計算差異並產生報表。</p>
+                                <a href="{{ url_for('stocktaking') }}" class="btn btn-warning">進入</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 更新最後更新時間
+    document.getElementById('last-update').textContent = new Date().toLocaleString('zh-TW');
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{% if action == 'add' %}新增儲位{% else %}編輯儲位{% endif %} - 倉儲管理系統{% endblock %}
+{% block page_title %}{% if action == 'add' %}新增儲位{% else %}編輯儲位{% endif %}{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('locations_list') }}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i>
+    返回列表
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    {% if action == 'add' %}新增儲位{% else %}編輯儲位{% endif %}
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="desc" class="form-label">儲位描述 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="desc" name="desc" 
+                               value="{% if location %}{{ location.desc }}{% endif %}" required
+                               placeholder="例如：一樓A區、二樓B區等">
+                        <div class="form-text">請輸入儲位的描述資訊，方便識別儲位位置</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('locations_list') }}" class="btn btn-secondary me-2">取消</a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if action == 'add' %}
+                                <i class="bi bi-plus-circle"></i>
+                                新增儲位
+                            {% else %}
+                                <i class="bi bi-check-circle"></i>
+                                更新儲位
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}入庫作業 - 倉儲管理系統{% endblock %}
+{% block page_title %}入庫作業{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">入庫作業</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('inbound_submit') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="product_id" class="form-label">選擇商品 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="product_id" name="product_id" required>
+                                <option value="">請選擇商品</option>
+                                {% for product_id, product in products.items() %}
+                                <option value="{{ product_id }}">{{ product.name }} ({{ product_id }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location_id" class="form-label">存放儲位 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="location_id" name="location_id" required>
+                                <option value="">請選擇儲位</option>
+                                {% for location_id, location in locations.items() %}
+                                <option value="{{ location_id }}">{{ location.desc }} ({{ location_id }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="quantity" class="form-label">入庫數量 <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" 
+                                   min="1" required placeholder="請輸入入庫數量">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">商品資訊</label>
+                            <div id="product-info" class="form-control-plaintext text-muted">
+                                請先選擇商品
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-arrow-down-circle"></i>
+                            確認入庫
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">操作說明</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="bi bi-info-circle"></i> 入庫流程說明</h6>
+                    <ol class="mb-0">
+                        <li>選擇要入庫的商品</li>
+                        <li>選擇存放的儲位</li>
+                        <li>輸入入庫數量</li>
+                        <li>確認入庫資訊</li>
+                        <li>系統自動更新庫存</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-exclamation-triangle"></i> 注意事項</h6>
+                    <ul class="mb-0">
+                        <li>入庫數量必須大於 0</li>
+                        <li>系統會自動累加到現有庫存</li>
+                        <li>入庫記錄會保存在交易歷史中</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('product_id').addEventListener('change', function() {
+    const productId = this.value;
+    const productInfo = document.getElementById('product-info');
+    
+    if (productId) {
+        // 這裡可以透過 AJAX 取得商品詳細資訊
+        fetch(`/api/products`)
+            .then(response => response.json())
+            .then(data => {
+                const product = data[productId];
+                if (product) {
+                    productInfo.innerHTML = `
+                        <strong>商品名稱：</strong>${product.name}<br>
+                        <strong>條碼：</strong>${product.barcode}<br>
+                        <strong>單位：</strong>${product.unit}<br>
+                        <strong>類別：</strong>${product.category}
+                    `;
+                }
+            });
+    } else {
+        productInfo.textContent = '請先選擇商品';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}商品管理 - 倉儲管理系統{% endblock %}
+{% block page_title %}商品管理{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('products_add') }}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i>
+    新增商品
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">商品列表</h6>
+    </div>
+    <div class="card-body">
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>商品編號</th>
+                        <th>商品名稱</th>
+                        <th>條碼</th>
+                        <th>單位</th>
+                        <th>類別</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product_id, product in products.items() %}
+                    <tr>
+                        <td>{{ product_id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.barcode }}</td>
+                        <td>{{ product.unit }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ product.category }}</span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('products_edit', product_id=product_id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil"></i>
+                                編輯
+                            </a>
+                            <a href="{{ url_for('products_delete', product_id=product_id) }}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('確定要刪除此商品嗎？')">
+                                <i class="bi bi-trash"></i>
+                                刪除
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-box fs-1 text-muted"></i>
+            <h5 class="text-muted mt-3">尚無商品資料</h5>
+            <p class="text-muted">請點擊「新增商品」按鈕開始建立商品資料</p>
+            <a href="{{ url_for('products_add') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>
+                新增商品
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

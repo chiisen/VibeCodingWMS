@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}盤點作業 - 倉儲管理系統{% endblock %}
+{% block page_title %}盤點作業{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('inventory') }}" class="btn btn-info btn-sm">
+    <i class="bi bi-clipboard-data"></i>
+    庫存查詢
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">盤點作業</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('stocktaking_submit') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="product_id" class="form-label">選擇商品 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="product_id" name="product_id" required>
+                                <option value="">請選擇商品</option>
+                                {% for product_id, product in products.items() %}
+                                <option value="{{ product_id }}">{{ product.name }} ({{ product_id }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location_id" class="form-label">盤點儲位 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="location_id" name="location_id" required>
+                                <option value="">請選擇儲位</option>
+                                {% for location_id, location in locations.items() %}
+                                <option value="{{ location_id }}">{{ location.desc }} ({{ location_id }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="actual_quantity" class="form-label">實際盤點數量 <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="actual_quantity" name="actual_quantity" 
+                                   min="0" required placeholder="請輸入實際盤點數量">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">系統庫存數量</label>
+                            <div id="system-quantity" class="form-control-plaintext text-muted">
+                                請先選擇商品和儲位
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info" id="difference-info" style="display: none;">
+                        <h6><i class="bi bi-calculator"></i> 盤點差異預覽</h6>
+                        <div id="difference-content"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check2-square"></i>
+                            確認盤點
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">操作說明</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="bi bi-info-circle"></i> 盤點流程說明</h6>
+                    <ol class="mb-0">
+                        <li>選擇要盤點的商品</li>
+                        <li>選擇盤點的儲位</li>
+                        <li>輸入實際盤點數量</li>
+                        <li>系統顯示盤點差異</li>
+                        <li>確認盤點結果</li>
+                        <li>系統更新庫存數量</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-exclamation-triangle"></i> 注意事項</h6>
+                    <ul class="mb-0">
+                        <li>盤點數量不能為負數</li>
+                        <li>系統會計算與原庫存的差異</li>
+                        <li>盤點記錄會保存在交易歷史中</li>
+                        <li>盤點完成後庫存會更新為實際數量</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-success">
+                    <h6><i class="bi bi-lightbulb"></i> 盤點小技巧</h6>
+                    <ul class="mb-0">
+                        <li>建議定期進行盤點作業</li>
+                        <li>盤點時注意商品包裝完整性</li>
+                        <li>如有差異請仔細確認數量</li>
+                        <li>可分批進行大範圍盤點</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 庫存概覽 -->
+        <div class="card shadow mt-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">庫存概覽</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>商品</th>
+                                <th>儲位</th>
+                                <th>庫存</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for (product_id, location_id), quantity in stocks.items() %}
+                            {% if product_id in products and location_id in locations %}
+                            <tr>
+                                <td>{{ products[product_id].name }}</td>
+                                <td>{{ locations[location_id].desc }}</td>
+                                <td>
+                                    <span class="badge {% if quantity == 0 %}bg-danger{% elif quantity <= 10 %}bg-warning{% else %}bg-success{% endif %}">
+                                        {{ quantity }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let systemQuantity = 0;
+
+function updateSystemQuantity() {
+    const productId = document.getElementById('product_id').value;
+    const locationId = document.getElementById('location_id').value;
+    const systemInfo = document.getElementById('system-quantity');
+    
+    if (productId && locationId) {
+        fetch(`/api/stock/${productId}/${locationId}`)
+            .then(response => response.json())
+            .then(data => {
+                systemQuantity = data.quantity;
+                systemInfo.innerHTML = `
+                    <strong>系統庫存：</strong>${systemQuantity}
+                `;
+                updateDifferencePreview();
+            })
+            .catch(error => {
+                systemInfo.innerHTML = '<span class="text-danger">查詢庫存失敗</span>';
+                systemQuantity = 0;
+            });
+    } else {
+        systemInfo.textContent = '請先選擇商品和儲位';
+        systemQuantity = 0;
+        document.getElementById('difference-info').style.display = 'none';
+    }
+}
+
+function updateDifferencePreview() {
+    const actualQuantity = parseInt(document.getElementById('actual_quantity').value) || 0;
+    const difference = actualQuantity - systemQuantity;
+    const differenceInfo = document.getElementById('difference-info');
+    const differenceContent = document.getElementById('difference-content');
+    
+    if (actualQuantity > 0) {
+        let diffText = '';
+        let diffClass = '';
+        
+        if (difference > 0) {
+            diffText = `盤盈 ${difference}`;
+            diffClass = 'text-success';
+        } else if (difference < 0) {
+            diffText = `盤虧 ${Math.abs(difference)}`;
+            diffClass = 'text-danger';
+        } else {
+            diffText = '盤點無差異';
+            diffClass = 'text-info';
+        }
+        
+        differenceContent.innerHTML = `
+            <strong>系統庫存：</strong>${systemQuantity}<br>
+            <strong>實際盤點：</strong>${actualQuantity}<br>
+            <strong>差異：</strong><span class="${diffClass}">${diffText}</span>
+        `;
+        differenceInfo.style.display = 'block';
+    } else {
+        differenceInfo.style.display = 'none';
+    }
+}
+
+document.getElementById('product_id').addEventListener('change', updateSystemQuantity);
+document.getElementById('location_id').addEventListener('change', updateSystemQuantity);
+document.getElementById('actual_quantity').addEventListener('input', updateDifferencePreview);
+</script>
+{% endblock %}

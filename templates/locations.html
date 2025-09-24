@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}儲位管理 - 倉儲管理系統{% endblock %}
+{% block page_title %}儲位管理{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('locations_add') }}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i>
+    新增儲位
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">儲位列表</h6>
+    </div>
+    <div class="card-body">
+        {% if locations %}
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>儲位編號</th>
+                        <th>儲位描述</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for location_id, location in locations.items() %}
+                    <tr>
+                        <td>{{ location_id }}</td>
+                        <td>{{ location.desc }}</td>
+                        <td>
+                            <a href="{{ url_for('locations_edit', location_id=location_id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil"></i>
+                                編輯
+                            </a>
+                            <a href="{{ url_for('locations_delete', location_id=location_id) }}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('確定要刪除此儲位嗎？')">
+                                <i class="bi bi-trash"></i>
+                                刪除
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-geo-alt fs-1 text-muted"></i>
+            <h5 class="text-muted mt-3">尚無儲位資料</h5>
+            <p class="text-muted">請點擊「新增儲位」按鈕開始建立儲位資料</p>
+            <a href="{{ url_for('locations_add') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>
+                新增儲位
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
